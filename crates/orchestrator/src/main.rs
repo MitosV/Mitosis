@@ -33,7 +33,6 @@ async fn main() -> Result<()> {
     info!("  Author: MitosV | Target: Minecraft 1.21.1 (Protocol 767)");
     info!("============================================================");
 
-    // 1. Load config.toml
     let config_path = Path::new("config.toml");
     let cfg = if config_path.exists() {
         AppConfig::load_from_file(config_path)?
@@ -55,7 +54,6 @@ async fn main() -> Result<()> {
         default_cfg
     };
 
-    // 2. Core services initialization
     info!(
         "Performance limits: {} MB RAM, {} worker threads, metrics={}",
         cfg.performance.memory_limit_mb, cfg.performance.worker_threads, cfg.performance.metrics
@@ -66,9 +64,7 @@ async fn main() -> Result<()> {
     let metrics = MetricsCollector::new();
     let benchmark_runner = Arc::new(BenchmarkRunner::new(metrics.clone()));
 
-    // 3. WebAssembly Plugin Host
     let mut plugin_host = PluginHost::new()?;
-    // Auto-discover and load compiled plugins from plugins/ directory
     let plugins_dir = Path::new("plugins");
     if plugins_dir.exists() {
         if let Ok(entries) = std::fs::read_dir(plugins_dir) {
@@ -86,7 +82,6 @@ async fn main() -> Result<()> {
     }
     let plugin_host = Arc::new(RwLock::new(plugin_host));
 
-    // 4. Groups initialization
     let groups_map = Arc::new(RwLock::new(HashMap::new()));
 
     for (group_name, group_sec) in &cfg.group {
@@ -115,12 +110,10 @@ async fn main() -> Result<()> {
             Some(skin_manager.clone()),
         );
 
-        // Spawn bots in group
         group.spawn_all();
         groups_map.write().await.insert(group_name.clone(), group);
     }
 
-    // 5. Start Web API & Dashboard
     let app_state = AppState {
         metrics,
         groups: groups_map.clone(),

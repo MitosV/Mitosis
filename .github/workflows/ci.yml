@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test-rust:
+    name: Test Rust Orchestrator & Crates
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: Compile WASM plugin
+        run: |
+          RUSTFLAGS="-C link-arg=--import-undefined" cargo build -p d4games --target wasm32-unknown-unknown --release
+          mkdir -p plugins
+          cp target/wasm32-unknown-unknown/release/d4games.wasm plugins/
+
+      - name: Cargo Check
+        run: cargo check --all-targets
+
+      - name: Cargo Test
+        run: cargo test --all
+
+  test-fabric-bridge:
+    name: Build Fabric 1.21.1 Bridge Mod
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Build Fabric Mod RemapJar
+        working-directory: ./fabric-bridge
+        run: |
+          chmod +x gradlew
+          ./gradlew remapJar

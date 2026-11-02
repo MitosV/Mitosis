@@ -14,15 +14,9 @@ public class MitosisBridgeMod implements DedicatedServerModInitializer {
 
     @Override
     public void onInitializeServer() {
-        LOGGER.info("==================================================");
-        LOGGER.info("  Mitosis Bridge Fabric Mod 1.21.1 Initialized");
-        LOGGER.info("  Author: MitosV | Protocol: 767");
-        LOGGER.info("==================================================");
+        LOGGER.info("Mitosis Bridge Fabric Mod 1.21.1 Initialized (Protocol 767)");
 
-        // Register Brigadier commands (/player or /bot fallback)
         CommandRegistrationCallback.EVENT.register(MitosisCommands::register);
-
-        // Register Server Tick telemetry
         ServerTickEvents.END_SERVER_TICK.register(ServerTelemetryReporter::onServerTick);
     }
 }

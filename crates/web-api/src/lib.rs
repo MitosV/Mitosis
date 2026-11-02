@@ -62,10 +62,6 @@ pub async fn start_server(addr: SocketAddr, state: AppState) -> Result<(), std::
     axum::serve(listener, app).await
 }
 
-// ---------------------------------------------------------------------------
-// Route Handlers
-// ---------------------------------------------------------------------------
-
 async fn get_status(State(state): State<AppState>) -> impl IntoResponse {
     let groups = state.groups.read().await;
     let mut total_bots = 0;

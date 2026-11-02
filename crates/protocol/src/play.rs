@@ -5,10 +5,6 @@ use crate::types::{
 };
 use crate::varint::{read_varint, write_varint, ProtocolError};
 
-// ---------------------------------------------------------------------------
-// Clientbound Play Packets
-// ---------------------------------------------------------------------------
-
 #[derive(Debug, Clone, PartialEq)]
 pub struct ClientboundLoginPacket {
     pub entity_id: i32,
@@ -306,10 +302,6 @@ impl ClientboundCustomPayloadPacket {
         Ok(Self { channel, data })
     }
 }
-
-// ---------------------------------------------------------------------------
-// Serverbound Play Packets
-// ---------------------------------------------------------------------------
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ServerboundAcceptTeleportationPacket {

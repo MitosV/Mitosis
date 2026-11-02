@@ -1,4 +1,4 @@
-use mitosis_physics::{move_colliding, PhysicsState, PlayerInput, AABB, GRAVITY, JUMP_VELOCITY};
+use mitosis_physics::{PhysicsState, PlayerInput};
 use mitosis_world_cache::SharedWorldCache;
 
 #[test]
@@ -12,11 +12,10 @@ fn test_fidelity_freefall_trajectory() {
 
     // Simulate 20 ticks (1 second) of freefall
     for tick in 1..=20 {
+        let vy_expected = (previous_vy - 0.08) * 0.98;
         state.tick(&input, &world);
 
-        // Vanilla Minecraft gravity verification:
-        // vy_expected = (previous_vy - 0.08) * 0.98
-        // y drops continuously
+        assert!((state.vy - vy_expected).abs() < 1e-4, "Tick {}: vy divergence", tick);
         assert!(state.y < previous_y, "Tick {}: state.y must decrease", tick);
         assert!(!state.on_ground, "Tick {}: bot must not be on ground during freefall", tick);
 

@@ -10,10 +10,6 @@ pub struct KnownPack {
     pub version: String,
 }
 
-// ---------------------------------------------------------------------------
-// Serverbound Configuration Packets
-// ---------------------------------------------------------------------------
-
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ServerboundClientInformationPacket {
     pub locale: String,
@@ -123,10 +119,6 @@ impl ServerboundSelectKnownPacksPacket {
         }
     }
 }
-
-// ---------------------------------------------------------------------------
-// Clientbound Configuration Packets
-// ---------------------------------------------------------------------------
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ClientboundCustomPayloadPacket {

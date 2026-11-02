@@ -10,7 +10,8 @@
   "description": "Massive headless bot simulation platform for Minecraft Java Edition. Designed and created by MitosV.",
   "features": null,
   "docker_images": {
-    "Debian Bookworm": "ghcr.io/mitosv/mitosis:latest"
+    "Pterodactyl Debian": "ghcr.io/pterodactyl/yolks:debian",
+    "Mitosis Custom Container": "ghcr.io/mitosv/mitosis:latest"
   },
   "file_denylist": [],
   "startup": "./mitosis-orchestrator",
@@ -22,7 +23,7 @@
   },
   "scripts": {
     "installation": {
-      "script": "#!/bin/bash\necho \"Installing Mitosis binary...\"\n",
+      "script": "#!/bin/bash\napt-get update && apt-get install -y curl tar ca-certificates\ncd /mnt/server\nRELEASE_URL=\"https://github.com/MitosV/Mitosis/releases/latest/download/mitosis-linux-x86_64.tar.gz\"\necho \"Fetching latest Mitosis release from $RELEASE_URL...\"\nif curl -sSL --fail \"$RELEASE_URL\" -o mitosis.tar.gz; then\n    tar -xzf mitosis.tar.gz\n    rm -f mitosis.tar.gz\n    chmod +x mitosis-orchestrator\n    echo \"Mitosis installed successfully.\"\nelse\n    echo \"Release tarball download failed. Ensuring directory skeleton...\"\n    mkdir -p plugins skins web\nfi\n",
       "container": "debian:bookworm-slim",
       "entrypoint": "bash"
     }

@@ -4,10 +4,6 @@ use uuid::Uuid;
 use crate::types::{read_byte_array, read_string, read_uuid, write_byte_array, write_string, write_uuid};
 use crate::varint::{read_varint, write_varint, ProtocolError};
 
-// ---------------------------------------------------------------------------
-// Serverbound Login Packets
-// ---------------------------------------------------------------------------
-
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ServerboundHelloPacket {
     pub name: String,
@@ -104,10 +100,6 @@ impl ServerboundLoginAcknowledgedPacket {
         Ok(Self)
     }
 }
-
-// ---------------------------------------------------------------------------
-// Clientbound Login Packets
-// ---------------------------------------------------------------------------
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ClientboundLoginDisconnectPacket {
