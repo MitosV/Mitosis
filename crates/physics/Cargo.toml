@@ -1,0 +1,15 @@
+[package]
+name = "mitosis-physics"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+mitosis-world-cache = { workspace = true }
+serde = { workspace = true }
+thiserror = { workspace = true }
+
+[[bench]]
+name = "physics_bench"
+harness = false

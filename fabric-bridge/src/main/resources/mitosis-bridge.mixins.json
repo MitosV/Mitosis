@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "com.mitosv.mitosis.bridge.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "ServerLoginNetworkHandlerMixin",
+    "MinecraftServerMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -1,0 +1,17 @@
+[package]
+name = "mitosis-networking"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+tokio = { workspace = true }
+bytes = { workspace = true }
+flate2 = { workspace = true }
+aes = { workspace = true }
+cfb8 = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+mitosis-protocol = { workspace = true }
+rand = { workspace = true }

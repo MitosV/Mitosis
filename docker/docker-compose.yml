@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  mitosis-orchestrator:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: mitosis-orchestrator
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - ../config.toml:/app/config.toml:ro
+      - ../plugins:/app/plugins
+      - ../skins:/app/skins
+    environment:
+      - RUST_LOG=info,mitosis_orchestrator=debug
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 4096M
+        reservations:
+          memory: 512M

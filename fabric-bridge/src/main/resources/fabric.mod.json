@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "mitosis-bridge",
+  "version": "${version}",
+  "name": "Mitosis Bridge",
+  "description": "Server-side Fabric integration bridge for the Mitosis Minecraft Headless Bot Engine",
+  "authors": [
+    "MitosV"
+  ],
+  "contact": {
+    "sources": "https://github.com/MitosV/mitosis"
+  },
+  "license": "MIT",
+  "environment": "server",
+  "entrypoints": {
+    "server": [
+      "com.mitosv.mitosis.bridge.MitosisBridgeMod"
+    ]
+  },
+  "mixins": [
+    "mitosis-bridge.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.0",
+    "minecraft": "~1.21.1",
+    "java": ">=21"
+  }
+}

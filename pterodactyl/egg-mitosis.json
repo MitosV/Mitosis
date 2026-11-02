@@ -1,0 +1,59 @@
+{
+  "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY MITOSIS",
+  "meta": {
+    "version": "PTDL_v2",
+    "update_url": null
+  },
+  "exported_at": "2026-11-01T23:22:48Z",
+  "name": "Mitosis Bot Engine",
+  "author": "mitosv@example.com",
+  "description": "Massive headless bot simulation platform for Minecraft Java Edition. Designed and created by MitosV.",
+  "features": null,
+  "docker_images": {
+    "Debian Bookworm": "ghcr.io/mitosv/mitosis:latest"
+  },
+  "file_denylist": [],
+  "startup": "./mitosis-orchestrator",
+  "config": {
+    "files": "{\r\n  \"config.toml\": {\r\n    \"parser\": \"file\",\r\n    \"find\": {\r\n      \"web_port = 8080\": \"web_port = {{server.build.default.port}}\"\r\n    }\r\n  }\r\n}",
+    "startup": "{\r\n  \"done\": \"Mitosis Orchestrator is operational\"\r\n}",
+    "logs": "{}",
+    "stop": "^C"
+  },
+  "scripts": {
+    "installation": {
+      "script": "#!/bin/bash\necho \"Installing Mitosis binary...\"\n",
+      "container": "debian:bookworm-slim",
+      "entrypoint": "bash"
+    }
+  },
+  "variables": [
+    {
+      "name": "Web Dashboard Port",
+      "description": "Port used by Mitosis Web API and Dashboard",
+      "env_variable": "WEB_PORT",
+      "default_value": "8080",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|numeric|between:1024,65535"
+    },
+    {
+      "name": "Memory Limit MB",
+      "description": "RAM ceiling configured for bot orchestrator",
+      "env_variable": "MEMORY_LIMIT_MB",
+      "default_value": "4096",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|numeric"
+    },
+    {
+      "name": "Log Level",
+      "description": "Rust tracing log level filter",
+      "env_variable": "RUST_LOG",
+      "default_value": "info,mitosis_orchestrator=debug",
+      "user_viewable": true,
+      "user_editable": true,
+      "rules": "required|string"
+    }
+  ]
+}

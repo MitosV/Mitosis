@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MITOSIS — Minecraft Headless Bot Engine</title>
+  <style>
+    :root {
+      --bg: #0f111a;
+      --card-bg: #1a1c29;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+      --success: #10b981;
+      --danger: #ef4444;
+      --border: #2e3248;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: var(--bg); color: var(--text); padding: 24px; }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+    h1 { font-size: 24px; display: flex; align-items: center; gap: 10px; }
+    .badge { background: var(--accent); color: white; font-size: 12px; padding: 3px 8px; border-radius: 4px; }
+    .author { color: var(--text-muted); font-size: 14px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 18px; }
+    .card-title { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 8px; }
+    .card-value { font-size: 28px; font-weight: 700; color: var(--text); }
+    .card-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+    .sections-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; }
+    .panel { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 20px; }
+    .panel-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; display: flex; justify-content: space-between; }
+    button { background: var(--accent); color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 14px; }
+    button:hover { background: var(--accent-hover); }
+    button.danger { background: var(--danger); }
+    input, select { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 6px; width: 100%; margin-bottom: 12px; font-size: 14px; }
+    .bot-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .bot-table th, .bot-table td { text-align: left; padding: 10px; border-bottom: 1px solid var(--border); }
+    .status-dot { height: 8px; width: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+    .status-dot.online { background: var(--success); }
+    .status-dot.offline { background: var(--danger); }
+    .log-box { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 12px; font-family: monospace; font-size: 12px; height: 160px; overflow-y: auto; color: #a7f3d0; }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>MITOSIS <span class="badge">Minecraft 1.21.1 Headless Bot Engine</span></h1>
+      <div class="author">Architect & Designer: <strong>MitosV</strong></div>
+    </div>
+    <div id="conn-status" style="font-size: 13px; color: var(--success);">● Connected to Telemetry WS</div>
+  </header>
+
+  <!-- Metric Overview Cards -->
+  <div class="grid">
+    <div class="card">
+      <div class="card-title">Connected Bots</div>
+      <div class="card-value" id="connected-bots">0</div>
+      <div class="card-sub" id="total-bots">Target: 0 bots</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Orchestrator CPU</div>
+      <div class="card-value" id="cpu-usage">0.0%</div>
+      <div class="card-sub">Multi-threaded Tokio scheduler</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Memory (RAM)</div>
+      <div class="card-value" id="ram-usage">0 MB</div>
+      <div class="card-sub" id="ram-total">Limit: 4096 MB</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Server TPS / MSPT</div>
+      <div class="card-value" id="server-tps">20.0 TPS</div>
+      <div class="card-sub" id="server-mspt">5.0 ms MSPT</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Transmitted Packets</div>
+      <div class="card-value" id="packets-sent">0</div>
+      <div class="card-sub" id="packets-recv">0 received</div>
+    </div>
+  </div>
+
+  <div class="sections-grid">
+    <!-- Group Control -->
+    <div class="panel">
+      <div class="panel-title">Bot Groups Control</div>
+      <label>Target Group</label>
+      <select id="group-select">
+        <option value="afk">afk (500 bots - Minimal)</option>
+        <option value="minigame">minigame (200 bots - Fidelity)</option>
+        <option value="pvp">pvp (100 bots - Fidelity)</option>
+      </select>
+      <label>Broadcast Action</label>
+      <select id="action-select">
+        <option value="forward">Move: Forward</option>
+        <option value="backward">Move: Backward</option>
+        <option value="jump">Action: Jump</option>
+        <option value="stop">Action: Stop</option>
+        <option value="attack">Action: Attack Continuous</option>
+      </select>
+      <div style="display: flex; gap: 10px; margin-top: 10px;">
+        <button onclick="dispatchGroupAction()">Send Action</button>
+        <button class="danger" onclick="disconnectGroup()">Disconnect Group</button>
+      </div>
+    </div>
+
+    <!-- WebAssembly Plugin Actions -->
+    <div class="panel">
+      <div class="panel-title">WASM Plugins & Dynamic Actions</div>
+      <label>Installed Plugin</label>
+      <select id="plugin-select">
+        <option value="d4games">d4games (v1.0.0)</option>
+      </select>
+      <label>Action</label>
+      <select id="plugin-action-select">
+        <option value="complete_game">complete_game</option>
+        <option value="select_option">select_option</option>
+      </select>
+      <label>Arguments</label>
+      <input type="text" id="plugin-args" placeholder="e.g. 1" value="1">
+      <button onclick="executePluginAction()">Execute Plugin Action</button>
+    </div>
+
+    <!-- E2E Benchmark Runner -->
+    <div class="panel" style="grid-column: span 2;">
+      <div class="panel-title">E2E Benchmark Runner</div>
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 12px;">
+        <div>
+          <label>Scenario</label>
+          <select id="bench-scenario">
+            <option value="movement">Movement & Physics (Fidelity)</option>
+            <option value="jump">Jump Stress Test</option>
+            <option value="stress">Full Action Stress</option>
+            <option value="afk">Mass AFK Baseline (Minimal)</option>
+          </select>
+        </div>
+        <div>
+          <label>Duration (Seconds)</label>
+          <input type="number" id="bench-duration" value="10">
+        </div>
+        <div>
+          <label>Bot Count</label>
+          <input type="number" id="bench-bots" value="200">
+        </div>
+        <div style="display: flex; align-items: flex-end;">
+          <button style="width: 100%; height: 38px; margin-bottom: 12px;" onclick="runBenchmark()">Run Benchmark</button>
+        </div>
+      </div>
+      <div class="log-box" id="bench-log">Ready to run benchmark scenario.</div>
+    </div>
+  </div>
+
+  <script>
+    // WebSocket Telemetry Stream
+    const ws = new WebSocket(`ws://${location.host}/ws/telemetry`);
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        document.getElementById('connected-bots').textContent = data.connected_bots;
+        document.getElementById('total-bots').textContent = `Target: ${data.total_bots} bots`;
+        document.getElementById('cpu-usage').textContent = `${data.cpu_usage_percent.toFixed(1)}%`;
+        document.getElementById('ram-usage').textContent = `${data.used_memory_mb} MB`;
+        document.getElementById('ram-total').textContent = `Total system: ${data.total_memory_mb} MB`;
+        document.getElementById('server-tps').textContent = `${data.server_tps.toFixed(1)} TPS`;
+        document.getElementById('server-mspt').textContent = `${data.server_mspt.toFixed(1)} ms MSPT`;
+        document.getElementById('packets-sent').textContent = data.packets_sent_total.toLocaleString();
+        document.getElementById('packets-recv').textContent = `${data.packets_received_total.toLocaleString()} received`;
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    ws.onclose = () => {
+      document.getElementById('conn-status').textContent = '○ Telemetry WS Reconnecting...';
+      document.getElementById('conn-status').style.color = 'var(--danger)';
+    };
+
+    async function dispatchGroupAction() {
+      const group = document.getElementById('group-select').value;
+      const actionType = document.getElementById('action-select').value;
+      let actionObj = {};
+      if (actionType === 'jump') actionObj = { Jump: null };
+      else if (actionType === 'stop') actionObj = { Stop: null };
+      else if (actionType === 'attack') actionObj = { Attack: { continuous: true } };
+      else actionObj = { Move: { direction: actionType } };
+
+      const res = await fetch(`/api/v1/groups/${group}/action`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: actionObj })
+      });
+      alert(res.ok ? `Action ${actionType} sent to group ${group}` : 'Failed to send action');
+    }
+
+    async function disconnectGroup() {
+      const group = document.getElementById('group-select').value;
+      await fetch(`/api/v1/groups/${group}/disconnect`, { method: 'POST' });
+      alert(`Disconnect signal sent to group ${group}`);
+    }
+
+    async function executePluginAction() {
+      const plugin = document.getElementById('plugin-select').value;
+      const action = document.getElementById('plugin-action-select').value;
+      const args = document.getElementById('plugin-args').value;
+
+      const res = await fetch(`/api/v1/plugins/${plugin}/action`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bot_id: 1, action, args })
+      });
+      const data = await res.json();
+      alert(`Plugin Result: ${JSON.stringify(data)}`);
+    }
+
+    async function runBenchmark() {
+      const log = document.getElementById('bench-log');
+      const scenario = document.getElementById('bench-scenario').value;
+      const duration = parseInt(document.getElementById('bench-duration').value) || 10;
+      const bot_count = parseInt(document.getElementById('bench-bots').value) || 200;
+
+      log.textContent = `[${new Date().toLocaleTimeString()}] Running benchmark '${scenario}' for ${duration}s...`;
+      const res = await fetch('/api/v1/benchmarks/run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: scenario,
+          duration_secs: duration,
+          ramp_up_secs: 2,
+          bot_count: bot_count,
+          action_type: scenario
+        })
+      });
+      const data = await res.json();
+      log.textContent = `[${new Date().toLocaleTimeString()}] Benchmark Result:\n` + JSON.stringify(data, null, 2);
+    }
+  </script>
+</body>
+</html>

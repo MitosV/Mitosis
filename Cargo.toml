@@ -1,0 +1,83 @@
+[workspace]
+members = [
+    "crates/protocol",
+    "crates/networking",
+    "crates/identity",
+    "crates/world-cache",
+    "crates/physics",
+    "crates/bot-runtime",
+    "crates/scheduler",
+    "crates/skins",
+    "crates/proxy",
+    "crates/plugin-sdk",
+    "crates/plugin-host",
+    "crates/benchmarking",
+    "crates/metrics",
+    "crates/web-api",
+    "crates/orchestrator",
+    "plugins/d4games",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["MitosV"]
+license = "MIT"
+repository = "https://github.com/MitosV/mitosis"
+
+[workspace.dependencies]
+tokio = { version = "1.40", features = ["full"] }
+bytes = "1.7"
+flate2 = "1.0"
+aes = "0.9"
+cfb8 = "0.9"
+sha2 = "0.10"
+hmac = "0.12"
+uuid = { version = "1.10", features = ["v4", "v5", "serde"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+toml = "0.8"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+thiserror = "2.0"
+anyhow = "1.0"
+wasmtime = { version = "36.0", default-features = false, features = ["cranelift", "std", "async"] }
+axum = { version = "0.8", features = ["ws"] }
+tower = "0.5"
+tower-http = { version = "0.6", features = ["cors", "fs", "trace"] }
+image = { version = "0.25", default-features = false, features = ["png"] }
+base64 = "0.22"
+rand = "0.8"
+sysinfo = "0.33"
+dashmap = "6.1"
+smallvec = "1.13"
+futures-util = "0.3"
+async-trait = "0.1"
+
+# Internal crates
+mitosis-protocol = { path = "crates/protocol" }
+mitosis-networking = { path = "crates/networking" }
+mitosis-identity = { path = "crates/identity" }
+mitosis-world-cache = { path = "crates/world-cache" }
+mitosis-physics = { path = "crates/physics" }
+mitosis-bot-runtime = { path = "crates/bot-runtime" }
+mitosis-scheduler = { path = "crates/scheduler" }
+mitosis-skins = { path = "crates/skins" }
+mitosis-proxy = { path = "crates/proxy" }
+mitosis-plugin-sdk = { path = "crates/plugin-sdk" }
+mitosis-plugin-host = { path = "crates/plugin-host" }
+mitosis-benchmarking = { path = "crates/benchmarking" }
+mitosis-metrics = { path = "crates/metrics" }
+mitosis-web-api = { path = "crates/web-api" }
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+panic = "abort"
+strip = true
+
+[profile.bench]
+opt-level = 3
+debug = true

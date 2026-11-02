@@ -1,0 +1,23 @@
+[package]
+name = "mitosis-bot-runtime"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+tokio = { workspace = true }
+bytes = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+uuid = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+mitosis-protocol = { workspace = true }
+mitosis-networking = { workspace = true }
+mitosis-identity = { workspace = true }
+mitosis-world-cache = { workspace = true }
+mitosis-physics = { workspace = true }
+mitosis-skins = { workspace = true }
+mitosis-proxy = { workspace = true }
+mitosis-plugin-host = { workspace = true }

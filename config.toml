@@ -1,0 +1,29 @@
+[orchestrator]
+web_host = "0.0.0.0"
+web_port = 8080
+secret_key = "mitosis_super_secure_installation_key_change_me"
+
+[performance]
+worker_threads = 0
+memory_limit_mb = 4096
+metrics = true
+
+[group.afk]
+server = "127.0.0.1:25565"
+prefix = "botafk_"
+count = 500
+mode = "minimal"
+
+[group.minigame]
+server = "127.0.0.1:25565"
+prefix = "botgame_"
+count = 200
+mode = "fidelity"
+plugins = ["d4games"]
+
+[group.pvp]
+server = "127.0.0.1:25565"
+prefix = "botpvp_"
+count = 100
+mode = "fidelity"
+plugins = []
